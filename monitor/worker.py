@@ -33,21 +33,36 @@ class WorkerThread(threading.Thread):
     while True:
       i += 1
       self.logger.info(
-          "Running assertion {}/{}({}). Iteration: {}"
-          .format(component_name, component_name, friendly_name, i)
+          "Running assertion {}/{}. Iteration: {}"
+          .format(component_name, friendly_name, i)
       )
 
-      result = self.run_assertion()
+      try:
+        result = self.run_assertion()
+      except Exception as e:
+        self.logger.error(
+            """Assertion {}/{} raised an exception different than PerformanceProblems, TestFailed and CompleteOutage. Iteration: {}\n
+            All error treatment should be done inside the assertion .test method. The assertion will be defined as failed but that doesn't mean
+            there is a problem with the component. The problem might be in your assertion code.\n
+            {}: {}"""
+            .format(component_name, friendly_name, i, e.__class__.__name__, e)
+        )
+        result = ASSERTION_FAILED
 
       if result == ASSERTION_SUCCESSFUL:
         self.logger.info(
-            "Assertion {}/{}({}) executed without errors. Iteration: {}"
-            .format(component_name, component_name, friendly_name, i)
+            "Assertion {}/{} executed without errors. Iteration: {}"
+            .format(component_name, friendly_name, i)
         )
       if result == ASSERTION_FAILED:
         self.logger.warning(
-            "Assertion {}/{}({}) failed. Iteration: {}"
-            .format(component_name, component_name, friendly_name, i)
+            "Assertion {}/{} failed. Iteration: {}"
+            .format(component_name, friendly_name, i)
+        )
+      if result == ASSERTION_COMPLETE_OUTAGE:
+        self.logger.warning(
+            "Assertion {}/{} reported complete outage. Iteration: {}"
+            .format(component_name, friendly_name, i)
         )
 
       self.lock.acquire()
@@ -68,6 +83,7 @@ class WorkerThread(threading.Thread):
       return ASSERTION_FAILED
     except CompleteOutage:
       return ASSERTION_COMPLETE_OUTAGE
+    return ASSERTION_SUCCESSFUL
 
   def check_object(self):
     """

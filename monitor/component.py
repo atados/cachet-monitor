@@ -1,17 +1,22 @@
 from .utils import import_from_string
 from .worker import WorkerThread
 from .status import *
+from .api import *
 import threading
 import shortuuid
 import logging
 
 class Component():
-  def __init__(self, name, assertions):
+  def __init__(self, name, id, assertions):
     self.name = name
+    self.id = id
     self.assertions = assertions
     self.history = {}
     self.last_status = None
     self.logger = logging.getLogger('monitor')
+
+    if not name or not id:
+      raise ValueError("Component name or id cannot be None. Define them in your settings.")
 
   def start(self):
     """
@@ -56,6 +61,7 @@ class Component():
     if status != self.last_status:
       self.logger.info("Component {} status has changed to {}".format(self.name, status))
       self.last_status = status
+      update_component(self.id, data={"status": status})
 
   def determine_component_status(self):
     """
@@ -67,6 +73,7 @@ class Component():
       ASSERTION_PERFORMANCE_PROBLEMS: 0,
       ASSERTION_COMPLETE_OUTAGE: 0,
     }
+
     for uuid, result in self.history.items():
       data[result] += 1
 

@@ -24,6 +24,8 @@ def start_monitoring(tests, logging_level=logging.DEBUG, logging_handler=None):
   """
   setup_logger(logging_level=logging_level, logging_handler=None)
 
-  for component_name, assertions in tests.items():
-    component = Component(component_name, assertions)
+  for component in tests:
+    component_name = component.get("name", None)
+    component_id = component.get("id", None)
+    component = Component(component_name, component_id, component["assertions"])
     component.start()
