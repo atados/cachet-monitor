@@ -4,7 +4,7 @@ import logging
 import uuid
 
 class WorkerThread(threading.Thread):
-  def __init__(self, assertion, interval=1):
+  def __init__(self, assertion, interval=1*60):
     super(WorkerThread, self).__init__()
     self.assertion = assertion
     self.interval = interval
@@ -30,7 +30,7 @@ class WorkerThread(threading.Thread):
 
   def check_object(self):
     """
-    Check assertion is associated to a component and has a uuid.
+    Check assertion is associated to a component and has an uuid.
     """
     component_name = getattr(self.assertion, "component_name", "")
     if not len(component_name):

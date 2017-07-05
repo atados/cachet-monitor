@@ -29,8 +29,10 @@ def start_monitoring(tests, logging_level=logging.DEBUG, logging_handler=None):
     for assertion in assertions:
       AssertionClass = import_from_string(assertion["assertion"])
       kwargs = assertion.get("kwargs", {})
+      settings = assertion.get("settings", {})
+
       assertion_object = AssertionClass(**kwargs)
       assertion_object.set_component_name(component_name)
 
-      thread = WorkerThread(assertion_object)
+      thread = WorkerThread(assertion_object, interval=settings.get("interval", 1*60))
       thread.start()
