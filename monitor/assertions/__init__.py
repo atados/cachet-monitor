@@ -1,7 +1,10 @@
 from monitor.exceptions import *
-import shortuuid
+import uuid
 
 class BaseAssertion():
+  def __init__(self):
+    self.uuid = str(uuid.uuid4())
+
   def set_friendly_name(self, friendly_name):
     """
     Set a friendly name to the assertion. This is useful so you can recognize the assertion in logs.
@@ -26,11 +29,8 @@ class BaseAssertion():
   def raise_performance_problems(self):
     raise PerformanceProblems()
 
-  def raise_partial_outage(self):
-    raise PartialOutage()
-
   def raise_complete_outage(self):
     raise CompleteOutage()
 
-  def raise_default_exception(self):
-    pass
+  def raise_failure(self):
+    raise TestFailed()
