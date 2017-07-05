@@ -1,7 +1,7 @@
 import threading
 import time
 import logging
-import uuid
+import shortuuid
 
 class WorkerThread(threading.Thread):
   def __init__(self, assertion, interval=1*60):
@@ -15,17 +15,30 @@ class WorkerThread(threading.Thread):
     Called when thread is started.
     """
     self.check_object()
-    assertion_uuid = self.assertion.uuid
+    self.loop()
+
+  def loop(self):
+    """
+    This method loops forever executing the assertion test method.
+    """
+    friendly_name = self.assertion.friendly_name
     component_name = self.assertion.component_name
     assertion_type = type(self.assertion).__name__
 
     i = 0
     while True:
       i += 1
-      iteration_uuid = str(uuid.uuid4())
-      self.logger.info("Running assertion {}/{}({}). Iteration: {}({})".format(component_name, assertion_type, assertion_uuid, i, iteration_uuid))
+
+      self.logger.info(
+          "Running assertion {}/{}({}). Iteration: {}"
+          .format(component_name, component_name, friendly_name, i)
+      )
       self.assertion.test()
-      self.logger.info("Assertion {}/{}({}) executed without errors. Iteration: {}({})".format(component_name, assertion_type, assertion_uuid, i, iteration_uuid))
+      self.logger.info(
+          "Assertion {}/{}({}) executed without errors. Iteration: {}"
+          .format(component_name, component_name, friendly_name, i)
+      )
+
       time.sleep(self.interval)
 
   def check_object(self):
@@ -36,6 +49,6 @@ class WorkerThread(threading.Thread):
     if not len(component_name):
       raise RuntimeError("Assertion object has no component name.")
 
-    uuid = getattr(self.assertion, "uuid", "")
-    if not len(uuid):
-      raise RuntimeError("Assertion object has no uuid. You are probably missing a super call on your __init__ method.")
+    friendly_name = getattr(self.assertion, "friendly_name", "")
+    if not len(friendly_name):
+      raise RuntimeError("Assertion object has no friendly_name.")

@@ -1,9 +1,12 @@
 from monitor.exceptions import *
-import uuid
+import shortuuid
 
 class BaseAssertion():
-  def __init__(self):
-    self.uuid = str(uuid.uuid4())
+  def set_friendly_name(self, friendly_name):
+    """
+    Set a friendly name to the assertion. This is useful so you can recognize the assertion in logs.
+    """
+    self.friendly_name = friendly_name
 
   def set_component_name(self, component_name):
     """
