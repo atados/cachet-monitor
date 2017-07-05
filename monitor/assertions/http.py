@@ -12,7 +12,10 @@ class ResourceStatusCode(BaseAssertion):
     super(ResourceStatusCode, self).__init__()
 
   def test(self):
-    request = requests.get(self.url)
+    try:
+      request = requests.get(self.url)
+    except:
+      self.raise_failure()
 
     if request.status_code != self.expected_status_code:
-      self.raise_partial_outage()
+      self.raise_failure()
