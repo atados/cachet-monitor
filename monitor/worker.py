@@ -62,10 +62,12 @@ class WorkerThread(threading.Thread):
     """
     try:
       self.assertion.test()
+    except PerformanceProblems:
+      return ASSERTION_PERFORMANCE_PROBLEMS
     except TestFailed:
       return ASSERTION_FAILED
-
-    return ASSERTION_SUCCESSFUL
+    except CompleteOutage:
+      return ASSERTION_COMPLETE_OUTAGE
 
   def check_object(self):
     """

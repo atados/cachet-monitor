@@ -65,13 +65,19 @@ class Component():
       ASSERTION_SUCCESSFUL: 0,
       ASSERTION_FAILED: 0,
       ASSERTION_PERFORMANCE_PROBLEMS: 0,
+      ASSERTION_COMPLETE_OUTAGE: 0,
     }
     for uuid, result in self.history.items():
       data[result] += 1
 
     # If no assertion raises exceptions, component is operational
-    if data[ASSERTION_FAILED] == 0 and data[ASSERTION_PERFORMANCE_PROBLEMS] == 0:
+    if data[ASSERTION_FAILED] == 0 and data[ASSERTION_PERFORMANCE_PROBLEMS] == 0 and data[ASSERTION_COMPLETE_OUTAGE] == 0:
       return COMPONENT_OPERATIONAL
+
+    # If at least one assertion raises CompleteOutage, we force component status
+    # to complete outage even if other assertions are successful
+    if data[ASSERTION_COMPLETE_OUTAGE] > 0:
+      return COMPONENT_COMPLETE_OUTAGE
 
     # Only response problems have been raised
     if data[ASSERTION_PERFORMANCE_PROBLEMS] > 0 and data[ASSERTION_FAILED] == 0:
