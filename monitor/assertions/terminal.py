@@ -3,11 +3,12 @@ import subprocess
 import logging
 
 class ExecuteCommand(BaseAssertion):
-  def __init__(self, command, expected_exit_code=0, expected_stdout=None, expected_stderr=None):
+  def __init__(self, command, expected_exit_code=0, expected_stdout=None, expected_stderr=None, strip_output=True):
     self.command = command
     self.expected_exit_code = expected_exit_code
     self.stdout = expected_stdout
     self.stderr = expected_stderr
+    self.strip_output = strip_output
     self.logger = logging.getLogger('monitor')
     super(ExecuteCommand, self).__init__()
 
@@ -19,6 +20,9 @@ class ExecuteCommand(BaseAssertion):
     proc = self.get_process()
     stdout, stderr = proc.communicate()
     exit_code = proc.returncode
+
+    if self.strip_output:
+      stdout, stderr = stdout.strip(), stderr.strip()
 
     # Check expected_stdout and expected_stderr are bytes
     if (self.stdout and not isinstance(self.stdout, (bytes, bytearray))) or (self.stderr and not isinstance(self.stderr, (bytes, bytearray))):
