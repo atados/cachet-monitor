@@ -47,7 +47,7 @@ class ExecuteCommand(BaseAssertion):
     # Check status code
     self.logger.debug("Checking exit code for command is: {}".format(self.expected_exit_code))
     if self.expected_exit_code != exit_code:
-      self.logger.debug("Checking failed.\n\exit_code: {}\nexpected_exit_code: {}".format(exit_code, self.expected_exit_code))
+      self.logger.debug("Checking failed.\n\nexit_code: {}\nexpected_exit_code: {}".format(exit_code, self.expected_exit_code))
       self.raise_failure()
 
 
