@@ -3,7 +3,7 @@ from . import BaseAssertion
 try:
   import requests
 except:
-  raise ImportError("Http assertions require the 'requests' module to be intalled")
+  raise ImportError("Http assertions require the 'requests' module to be installed")
 
 class ResourceStatusCode(BaseAssertion):
   def __init__(self, url, expected_status_code):
