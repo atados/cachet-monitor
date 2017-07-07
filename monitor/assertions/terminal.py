@@ -33,6 +33,7 @@ class ExecuteCommand(BaseAssertion):
       self.logger.debug("Checking output for command is: {}".format(self.stdout))
 
       if stdout != self.stdout:
+        self.logger.debug("Checking failed.\n\nstdout: {}\nexpected_stdout: {}".format(stdout, self.stdout))
         self.raise_failure()
 
     # Check stderr
@@ -40,10 +41,13 @@ class ExecuteCommand(BaseAssertion):
       self.logger.debug("Checking output for command is: {}".format(self.stderr))
 
       if stderr != self.stderr:
+        self.logger.debug("Checking failed.\n\nstderr: {}\nexpected_stderr: {}".format(stderr, self.stderr))
         self.raise_failure()
 
     # Check status code
+    self.logger.debug("Checking exit code for command is: {}".format(self.expected_exit_code))
     if self.expected_exit_code != exit_code:
+      self.logger.debug("Checking failed.\n\exit_code: {}\nexpected_exit_code: {}".format(exit_code, self.expected_exit_code))
       self.raise_failure()
 
 
