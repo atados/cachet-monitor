@@ -7,12 +7,14 @@ import shortuuid
 import logging
 
 class Component():
-  def __init__(self, name, id, assertions):
+  def __init__(self, name, id, assertions, api, incidents={}):
     self.name = name
     self.id = id
     self.assertions = assertions
+    self.api = api
     self.history = {}
     self.last_status = None
+    self.incidents = incidents
     self.logger = logging.getLogger('monitor')
 
     if not name or not id:
@@ -61,7 +63,13 @@ class Component():
     if status != self.last_status:
       self.logger.info("Component {} status has changed to {}".format(self.name, status))
       self.last_status = status
-      update_component(self.id, data={"status": status})
+      self.api.update_component(self.id, data={"status": status})
+
+      if status != COMPONENT_OPERATIONAL:
+        if self.incidents:
+          if not self.api.component_has_open_incidents(self.id):
+            self.api.create_incident(self.id, data=dict({"status": 2, "component_status": status}, **self.incidents))
+
 
   def determine_component_status(self):
     """
